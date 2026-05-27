@@ -901,35 +901,37 @@ function submitCheckout(event) {
   const subtotal = getCartTotals().subtotal;
   const total = subtotal + moneyToBigInt(delivery);
   const lines = [
-    "*Nuevo pedido Arepas Dog Burger*",
+    "🧾 *Nuevo Pedido - Arepas Dog Burger 🍔✅*",
+    `👤 Cliente: ${name}`,
+    `📞 Teléfono: ${phone}`,
+    `🚚 Tipo: ${method}`,
+    method === "domicilio" ? `📍 Dirección: ${address}` : "",
+    `💳 Pago: ${payment}`,
     "",
-    `Cliente: ${name}`,
-    `Telefono: ${phone}`,
-    `Entrega: ${method}`,
-    method === "domicilio" ? `Direccion: ${address}` : "",
-    `Pago: ${payment}`,
-    notes ? `Notas: ${notes}` : "",
-    "",
-    "*Detalle:*"
+    "🍔 *Detalle del pedido:*"
   ].filter(Boolean);
 
-  state.cart.forEach((item, index) => {
+  state.cart.forEach(item => {
     const qty = clampQuantity(item.qty);
-    const optionText = item.option_label ? ` (${item.option_label})` : "";
-    lines.push(`${index + 1}. ${qty}x ${item.title}${optionText} - ${formatMoney(moneyToBigInt(item.price) * qtyToBigInt(qty))}`);
+    const optionText = item.option_label || "";
+    lines.push(`${qty}x ${item.title} (${optionText}) — *${formatMoney(moneyToBigInt(item.price) * qtyToBigInt(qty))}*`);
     if ((item.extras || []).length) {
       item.extras.forEach(extra => {
         const extraQty = clampQuantity(extra.qty);
-        lines.push(`   + ${extraQty}x ${extra.nombre} - ${formatMoney(moneyToBigInt(extra.precio) * qtyToBigInt(extraQty))}`);
+        lines.push(`   ➕ ${extraQty}x ${extra.nombre} (${formatMoney(moneyToBigInt(extra.precio) * qtyToBigInt(extraQty))})`);
       });
     }
-    lines.push(`   Linea: ${formatMoney(getItemTotal(item))}`);
   });
 
+  const deliveryText = method === "recoger"
+    ? "Sin costo (recoge en el local)"
+    : formatMoney(delivery);
+
   lines.push("");
-  lines.push(`Subtotal: ${formatMoney(subtotal)}`);
-  lines.push(`Domicilio: ${formatMoney(delivery)}`);
-  lines.push(`Total: ${formatMoney(total)}`);
+  lines.push(`🧮 Subtotal: ${formatMoney(subtotal)}`);
+  lines.push(`🏪 Envío: ${deliveryText}`);
+  lines.push(`💰 *Total: ${formatMoney(total)}*`);
+  lines.push(`📝 Notas: ${notes || "Sin notas"}`);
 
   const whatsappUrl = `https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(lines.join("\n"))}`;
   window.open(whatsappUrl, "_blank", "noopener,noreferrer");

@@ -905,11 +905,11 @@ function submitCheckout(event) {
     `👤 Cliente: ${name}`,
     `📞 Teléfono: ${phone}`,
     `🚚 Tipo: ${method}`,
-    method === "domicilio" ? `📍 Dirección: ${address}` : "",
+    ...(method === "domicilio" ? [`📍 Dirección: ${address}`] : []),
     `💳 Pago: ${payment}`,
     "",
     "🍔 *Detalle del pedido:*"
-  ].filter(Boolean);
+  ];
 
   state.cart.forEach(item => {
     const qty = clampQuantity(item.qty);

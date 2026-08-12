@@ -1515,7 +1515,7 @@ function resolveProductImage(product) {
   const images = PRODUCT_IMAGE_LIBRARY[family] || PRODUCT_IMAGE_LIBRARY.default;
   const source = `${product.producto_id || ""}:${product.nombre || ""}`;
   const index = [...source].reduce((total, character) => total + character.charCodeAt(0), 0) % images.length;
-  return `./images/hot-kitchen/${images[index]}`;
+  return `./images/${images[index]}`;
 }
 
 function detectProductImageFamily(product) {

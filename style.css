@@ -160,6 +160,9 @@ a {
   font-weight: 950;
   letter-spacing: 0.06em;
   filter: drop-shadow(0 10px 24px rgba(215, 25, 32, 0.34));
+  object-fit: contain;
+  padding: 4px;
+  background: transparent;
 }
 
 .top-actions {
@@ -1120,6 +1123,9 @@ form label {
   letter-spacing: 0.08em;
   filter: drop-shadow(0 18px 34px rgba(197, 19, 28, 0.4));
   animation: sideLogoFloat 4.8s ease-in-out infinite, sideLogoHeat 1s ease-in-out infinite;
+  object-fit: contain;
+  padding: 8px;
+  background: transparent;
 }
 
 .side-brand h2 {
@@ -1726,6 +1732,9 @@ form label {
   font-weight: 950;
   letter-spacing: 0.06em;
   filter: drop-shadow(0 10px 18px rgba(197, 19, 28, 0.28));
+  object-fit: contain;
+  padding: 4px;
+  background: transparent;
 }
 
 .loader-card strong {

@@ -6,10 +6,8 @@
   <meta name="theme-color" content="#090909">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Arepas Dog Burger">
-  <title>Arepas Dog Burger | Carta Premium</title>
-  <link rel="icon" type="image/png" href="./images/favicon.png">
-  <link rel="apple-touch-icon" href="./images/favicon.png">
+  <meta name="apple-mobile-web-app-title" content="The Hot Kitchen">
+  <title>The Hot Kitchen | Carta Premium</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./style.css">
 </head>
@@ -20,11 +18,11 @@
         <span></span><span></span><span></span>
       </button>
 
-      <a class="brand" href="#inicio" aria-label="Arepas Dog Burger">
-        <img class="brand-logo" src="./images/logo.png" alt="Arepas Dog Burger">
+      <a class="brand" href="#inicio" aria-label="The Hot Kitchen">
+        <span class="brand-logo" aria-hidden="true">THK</span>
         <span>
-          <strong>Arepas Dog Burger</strong>
-          <small>Manizales, Peralonzo</small>
+          <strong>The Hot Kitchen</strong>
+          <small>Pedidos directos</small>
         </span>
       </a>
 
@@ -41,7 +39,7 @@
       <section class="hero">
         <div class="hero-copy">
           <span class="eyebrow">Carta inteligente</span>
-          <h1>Comida rapida con pedido premium.</h1>
+          <h1>Sabor intenso, pedido sencillo.</h1>
           <p>Arma tu orden, confirma el total y te llevamos a WhatsApp con el detalle listo para enviar.</p>
         </div>
         <div class="hero-panel" aria-label="Estado de la tienda">
@@ -74,12 +72,11 @@
     <div class="side-panel">
       <button class="round-btn side-close" id="close-menu" type="button" aria-label="Cerrar menu">x</button>
       <div class="side-brand">
-        <img class="side-logo" src="./images/logo.png" alt="Arepas Dog Burger">
-        <h2>Arepas Dog Burger</h2>
+        <span class="side-logo" aria-hidden="true">THK</span>
+        <h2>The Hot Kitchen</h2>
         <p>Pedidos al instante, sabor encendido y una carta lista para antojos premium.</p>
       </div>
-      <a class="side-link" href="https://wa.me/573115990064" target="_blank" rel="noreferrer"><span>WhatsApp</span><small>Pedidos directos</small></a>
-      <a class="side-link" href="https://www.instagram.com/arepas_dog/" target="_blank" rel="noreferrer"><span>Instagram</span><small>Novedades y fotos</small></a>
+      <a class="side-link" href="https://wa.me/573042783617" target="_blank" rel="noreferrer"><span>WhatsApp</span><small>Pedidos directos</small></a>
       <button class="ghost-btn full" id="admin-open-menu" type="button">Panel administrativo</button>
     </div>
   </aside>
@@ -94,8 +91,8 @@
     </header>
     <div class="cart-items" id="cart-items"></div>
     <footer class="drawer-footer">
-      <div class="summary-row"><span>Subtotal</span><strong id="cart-subtotal">$0</strong></div>
-      <div class="summary-row total"><span>Total</span><strong id="cart-total">$0</strong></div>
+      <div class="summary-row hidden"><span>Subtotal</span><strong id="cart-subtotal">$0</strong></div>
+      <div class="summary-row total"><span>Total a pagar</span><strong id="cart-total">$0</strong></div>
       <button class="primary-btn" id="checkout-btn" type="button">Confirmar orden</button>
       <button class="danger-btn" id="clear-cart" type="button">Vaciar carrito</button>
     </footer>
@@ -247,7 +244,7 @@
   <div class="loader-overlay hidden" id="app-loader" aria-hidden="true" role="status">
     <div class="loader-card">
       <div class="loader-orbit">
-        <img src="./images/logo.png" alt="">
+        <span class="loader-mark" aria-hidden="true">THK</span>
       </div>
       <strong id="loader-title">Sincronizando carta</strong>
       <span id="loader-text">Estamos preparando la informacion.</span>
@@ -255,9 +252,5 @@
   </div>
 
   <script src="./app.js"></script>
-  <script>
-  const project_id = "AREPAS-DOG-BURGER";
-</script>
-<script src="https://devnnex.github.io/DEVNEX-BLOQUEO.COM/js/project-guard.js"></script>
 </body>
 </html>

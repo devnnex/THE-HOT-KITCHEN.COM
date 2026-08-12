@@ -1,137 +1,41 @@
-let API_URL = "https://script.google.com/macros/s/AKfycbyOADjmcKbyrDtEVfJdbGTGc2hO93WqEzDSGdjDEDEc_7bmL6hSucEGgI-4-m2a2FQ0/exec";
+// Cambia solo esta URL cuando el nuevo backend este listo. La app acepta
+// respuestas { products }, { productos }, o categorias con productos anidados.
+const API_URL = window.HOT_KITCHEN_API_URL || "https://script.google.com/macros/s/AKfycby4vlZuwNB26Ke9PLRbe5OiiCoZTv2dmMkNh0QJ_LlTV7ZE8zs2DDx3FUXXxmaMrha2/exec";
 
-const BUSINESS_PHONE = "573115990064";
+const BUSINESS_NAME = "The Hot Kitchen";
+const BUSINESS_PHONE = "573042783617";
 const DELIVERY_FEE = 0;
 const CART_KEY = "adb_cart_v2";
+const MENU_CACHE_PREFIX = "thk_menu_cache_v1:";
+const MENU_CACHE_TTL_MS = 15000;
 const MAX_QTY = 999999;
-const STATIC_PRODUCT_IMAGES = [
-  "3Carnes.png",
-  "Arepaburger.png",
-  "Arepadoblecarne.png",
-  "arepafiletedepollo.png",
-  "beb1.png",
-  "beb2.png",
-  "beb3.png",
-  "beb4.png",
-  "beb5.png",
-  "beb6.png",
-  "bretana.png",
-  "burrito3.png",
-  "carne2.png",
-  "carne8.png",
-  "chuzodecerdo.png",
-  "chuzomixto.png",
-  "cocaCola.png",
-  "combinada.png",
-  "DobleCarne.png",
-  "FileteDePollo.png",
-  "H2O.png",
-  "hamburgesa22.png",
-  "hamburgesa56.png",
-  "hamburgesa9.png",
-  "hit.png",
-  "maicito1.png",
-  "maicitosrancheros.png",
-  "malteada1.png",
-  "mangobiche.png",
-  "mixta.png",
-  "otros1.png",
-  "p3.png",
-  "p4.png",
-  "paisa.png",
-  "pap1.png",
-  "pap2.png",
-  "pap3.png",
-  "pap5.png",
-  "Pataburger.png",
-  "PataconCarneDesmechada.png",
-  "PataconPolloDesmechado.png",
-  "PataconQuesudo.png",
-  "perraDog.png",
-  "perroPaisa.png",
-  "postobon.png",
-  "premio.png",
-  "quatro.png",
-  "Quesudo.png",
-  "Ranchera.png",
-  "ranchero.png",
-  "Royal.png",
-  "Salchicostilla.png",
-  "Salchipaisa.png",
-  "salchipapa.png",
-  "salchipapa4.png",
-  "Salchiperros.png",
-  "salchiranchera.png",
-  "salchitoci.png",
-  "Sandwichcombinado.png",
-  "SandwichMixto.png",
-  "SandwichPernil.png",
-  "sprite.png",
-  "Super.png",
-  "tamarindoescarchada.png",
-  "TociBurger.png",
-  "tradicional.png",
-  "TripleCarne.png",
-  "xxxxxxxx.png"
-];
-
-const KNOWN_PRODUCT_IMAGES_BY_ID = {
-  b1: { category: "hamburguesas", name: "Hamburguesa 3 Carnes", image: "3Carnes.png" },
-  b13: { category: "hamburguesas", name: "Hamburguesa Ranchera", image: "Ranchera.png" },
-  b2: { category: "hamburguesas", name: "Hamburguesa TociBurger", image: "TociBurger.png" },
-  b3: { category: "hamburguesas", name: "Hamburguesa Triple Carne", image: "TripleCarne.png" },
-  b4: { category: "hamburguesas", name: "Hamburguesa Super", image: "Super.png" },
-  b5: { category: "hamburguesas", name: "Hamburguesa Royal", image: "Royal.png" },
-  b6: { category: "hamburguesas", name: "Hamburguesa Combinada", image: "combinada.png" },
-  b7: { category: "hamburguesas", name: "Hamburguesa Doble Carne", image: "DobleCarne.png" },
-  b8: { category: "hamburguesas", name: "Hamburguesa Paisa", image: "paisa.png" },
-  b9: { category: "hamburguesas", name: "Hamburguesa Quesuda", image: "hamburgesa9.png" },
-  b10: { category: "hamburguesas", name: "Hamburguesa Mixta", image: "mixta.png" },
-  p1: { category: "perros", name: "Perra Dog", image: "perraDog.png" },
-  p2: { category: "perros", name: "Perro Paisa", image: "perroPaisa.png" },
-  p3: { category: "perros", name: "Perro Quesudo", image: "Quesudo.png" },
-  p4: { category: "perros", name: "Perro Doble Americano", image: "p4.png" },
-  p5: { category: "perros", name: "Perro Ranchero", image: "ranchero.png" },
-  p8: { category: "perros", name: "Perro Tradicional", image: "tradicional.png" },
-  p10: { category: "perros", name: "Salchi Perro", image: "Salchiperros.png" },
-  p11: { category: "perros", name: "Perro Salchiranchero", image: "Salchiperros.png" },
-  p12: { category: "perros", name: "Perro SalchiAmericano", image: "Salchiperros.png" },
-  p13: { category: "perros", name: "Perro SalchiSuizo", image: "Salchiperros.png" },
-  s1: { category: "sandwiches", name: "Sandwich Pernil", image: "SandwichPernil.png" },
-  s2: { category: "sandwiches", name: "Sandwich Combinado", image: "Sandwichcombinado.png" },
-  s3: { category: "sandwiches", name: "Sandwich Mixto", image: "SandwichMixto.png" },
-  c2: { category: "carnes", name: "Asado Mixto", image: "carne2.png" },
-  c4: { category: "carnes", name: "Filete de Pollo a la Plancha", image: "FileteDePollo.png" },
-  c5: { category: "carnes", name: "Chuzo Mixto", image: "chuzomixto.png" },
-  c6: { category: "carnes", name: "Chuzo de Cerdo", image: "chuzodecerdo.png" },
-  c8: { category: "carnes", name: "Chuzo de Pollo", image: "carne8.png" },
-  pt1: { category: "patacones", name: "Patacon Quesudo Mixto", image: "PataconQuesudo.png" },
-  pt4: { category: "patacones", name: "Patacon Pollo Desmechado", image: "PataconPolloDesmechado.png" },
-  pt5: { category: "patacones", name: "Patacon Carne Desmechada", image: "PataconCarneDesmechada.png" },
-  pt6: { category: "patacones", name: "Pataburger", image: "Pataburger.png" },
-  m1: { category: "maicitos", name: "Maicitos Mixto", image: "maicito1.png" },
-  m2: { category: "maicitos", name: "Maicitos Rancheros", image: "maicitosrancheros.png" },
-  sa1: { category: "salchipapas", name: "Salchicostilla", image: "Salchicostilla.png" },
-  sa2: { category: "salchipapas", name: "Salchitoci", image: "salchitoci.png" },
-  sa3: { category: "salchipapas", name: "Salchiranchera", image: "salchiranchera.png" },
-  sa4: { category: "salchipapas", name: "Salchiquesuda", image: "salchipapa4.png" },
-  sa5: { category: "salchipapas", name: "Salchipaisa", image: "Salchipaisa.png" },
-  sa7: { category: "salchipapas", name: "Salchipapa Dog", image: "salchipapa.png" },
-  a1: { category: "arepas", name: "Arepa Doble Carne Dog", image: "Arepadoblecarne.png" },
-  a6: { category: "arepas", name: "Arepa Con Filete Dog", image: "arepafiletedepollo.png" },
-  a7: { category: "arepas", name: "Arepaburger", image: "Arepaburger.png" },
-  bur3: { category: "burritos", name: "Burrito Pollo y Tocineta", image: "burrito3.png" },
-  l2: { category: "limonadas", name: "Limonada de Mango Biche", image: "mangobiche.png" },
-  l5: { category: "limonadas", name: "Tamarindo Escarchada", image: "tamarindoescarchada.png" },
-  g1: { category: "gaseosas", name: "Postobon", image: "postobon.png" },
-  g2: { category: "gaseosas", name: "Sprite", image: "sprite.png" },
-  g3: { category: "gaseosas", name: "Quatro", image: "quatro.png" },
-  g4: { category: "gaseosas", name: "Coca-Cola", image: "cocaCola.png" },
-  g5: { category: "gaseosas", name: "Bretana", image: "bretana.png" },
-  g6: { category: "gaseosas", name: "H2O", image: "H2O.png" },
-  g7: { category: "gaseosas", name: "Hit", image: "hit.png" },
-  g8: { category: "gaseosas", name: "Premio", image: "premio.png" },
-  malte1: { category: "malteadas", name: "Malteadas", image: "malteada1.png" }
+const PRODUCT_IMAGE_LIBRARY = {
+  hamburguesas: ["burger-1.jpg", "burger-2.jpg"],
+  perros: ["hotdog-1.jpg"],
+  sandwiches: ["sandwich-1.jpg"],
+  carnes: ["steak-1.jpg", "skewer-1.jpg"],
+  chuzos: ["skewer-1.jpg"],
+  wings: ["wings-1.jpg"],
+  patacones: ["plantain-1.jpg"],
+  maicitos: ["corn-1.jpg"],
+  salchipapas: ["fries-1.jpg"],
+  dorilocos: ["fries-1.jpg"],
+  "lo-de-casita": ["wings-1.jpg", "steak-1.jpg", "corn-1.jpg"],
+  picadas: ["picada-1.jpg"],
+  choripan: ["skewer-1.jpg"],
+  "pica-hot": ["skewer-1.jpg", "steak-1.jpg"],
+  "parrilla-ardiente": ["steak-1.jpg", "skewer-1.jpg"],
+  adicionales: ["fries-1.jpg"],
+  "canoas-en-llamas": ["canoa-1.jpg"],
+  arepas: ["arepa-1.jpg"],
+  burritos: ["burrito-1.jpg"],
+  jugos: ["juice-1.jpg"],
+  limonadas: ["lemonade-1.jpg"],
+  gaseosas: ["soda-1.jpg"],
+  malteadas: ["milkshake-1.jpg"],
+  bebidas: ["juice-1.jpg", "soda-1.jpg"],
+  papas: ["fries-1.jpg"],
+  default: ["burger-2.jpg"]
 };
 
 const IMAGE_CATEGORY_GROUPS = {
@@ -152,6 +56,9 @@ const IMAGE_CATEGORY_GROUPS = {
   },
   sandwiches: {
     aliases: ["sandwich", "sandwiches", "sanduche", "sanduches"]
+  },
+  carnes: {
+    aliases: ["carne", "carnes", "churrasco", "asado", "filete", "cerdo"]
   },
   bebidas: {
     aliases: ["bebida", "bebidas", "beb", "gaseosa", "jugo", "malteada", "coca", "cola", "postobon", "quatro", "sprite", "premio", "hit", "h2o", "bretana", "mango", "mangobiche", "tamarindo"]
@@ -178,6 +85,7 @@ const CATEGORY_DETECTION_ORDER = [
   "hamburguesas",
   "patacones",
   "sandwiches",
+  "carnes",
   "bebidas",
   "arepas",
   "perros",
@@ -191,8 +99,14 @@ const CATEGORY_DETECTION_ORDER = [
 const CATEGORY_ORDER = [
   "hamburguesas",
   "perros",
+  "choripan",
   "sandwiches",
   "carnes",
+  "parrilla-ardiente",
+  "pica-hot",
+  "picadas",
+  "lo-de-casita",
+  "canoas-en-llamas",
   "patacones",
   "maicitos",
   "salchipapas",
@@ -202,7 +116,8 @@ const CATEGORY_ORDER = [
   "jugos",
   "limonadas",
   "gaseosas",
-  "malteadas"
+  "malteadas",
+  "adicionales"
 ];
 
 const CATEGORY_LABELS = {
@@ -219,7 +134,14 @@ const CATEGORY_LABELS = {
   jugos: "Jugos",
   limonadas: "Limonadas",
   gaseosas: "Gaseosas",
-  malteadas: "Malteadas"
+  malteadas: "Malteadas",
+  "lo-de-casita": "Lo de Casita",
+  picadas: "Picadas",
+  choripan: "Choripán",
+  "pica-hot": "Pica Hot",
+  "parrilla-ardiente": "Parrilla Ardiente",
+  adicionales: "Adicionales",
+  "canoas-en-llamas": "Canoas en Llamas"
 };
 
 const CATEGORIES_WITHOUT_EXTRAS = new Set([
@@ -293,6 +215,13 @@ const state = {
   editingProductId: "",
   editingExtraId: ""
 };
+
+let menuRequest = null;
+let catalogRenderFrame = 0;
+
+function menuCacheKey() {
+  return `${MENU_CACHE_PREFIX}${API_URL.trim() || "demo"}`;
+}
 
 const el = {
   categories: document.getElementById("categories"),
@@ -374,10 +303,33 @@ async function init() {
 function bindEvents() {
   el.search.addEventListener("input", () => {
     state.search = el.search.value.trim().toLowerCase();
-    renderProducts();
+    scheduleCatalogRender();
   });
 
-  el.refreshMenu.addEventListener("click", loadMenu);
+  el.refreshMenu.addEventListener("click", () => loadMenu({ force: true }));
+  el.categories.addEventListener("click", event => {
+    const button = event.target.closest("[data-category]");
+    if (!button) return;
+    state.activeCategory = button.dataset.category;
+    renderCategories();
+    renderProducts();
+  });
+  el.catalog.addEventListener("click", event => {
+    const button = event.target.closest("[data-add-product]");
+    if (button) openProductModal(button.dataset.addProduct);
+  });
+  el.cartItems.addEventListener("click", event => {
+    const button = event.target.closest("[data-cart-plus], [data-cart-minus], [data-cart-remove], [data-cart-edit]");
+    if (!button) return;
+    if (button.dataset.cartPlus != null) return changeCartQty(Number(button.dataset.cartPlus), 1);
+    if (button.dataset.cartMinus != null) return changeCartQty(Number(button.dataset.cartMinus), -1);
+    if (button.dataset.cartRemove != null) return removeCartItem(Number(button.dataset.cartRemove));
+    const index = Number(button.dataset.cartEdit);
+    const item = state.cart[index];
+    if (!item) return;
+    closeCart();
+    openProductModal(item.product_id, index);
+  });
   el.openCart.addEventListener("click", openCart);
   el.floatingCart.addEventListener("click", openCart);
   el.closeCart.addEventListener("click", closeCart);
@@ -414,7 +366,7 @@ function bindEvents() {
   });
   el.adminClose.addEventListener("click", closeAdmin);
   el.adminLogout.addEventListener("click", () => logoutAdmin(true));
-  el.adminReload.addEventListener("click", loadMenu);
+  el.adminReload.addEventListener("click", () => loadMenu({ force: true }));
   el.adminUnlock.addEventListener("click", unlockAdmin);
   el.adminToken.addEventListener("keydown", event => {
     if (event.key === "Enter") unlockAdmin();
@@ -422,6 +374,27 @@ function bindEvents() {
 
   document.querySelectorAll("[data-admin-tab]").forEach(button => {
     button.addEventListener("click", () => setAdminTab(button.dataset.adminTab));
+  });
+  el.adminProductCategories.addEventListener("click", event => {
+    const button = event.target.closest("[data-admin-product-category]");
+    if (!button) return;
+    state.adminProductCategory = button.dataset.adminProductCategory;
+    state.adminProductSearch = "";
+    el.adminProductSearch.value = "";
+    renderAdminProductCategories();
+    renderAdminProducts();
+  });
+  el.productList.addEventListener("click", event => {
+    const editButton = event.target.closest("[data-edit-product]");
+    if (editButton) return fillProductForm(editButton.dataset.editProduct);
+    const deleteButton = event.target.closest("[data-delete-product]");
+    if (deleteButton) deleteProduct(deleteButton.dataset.deleteProduct);
+  });
+  el.extraList.addEventListener("click", event => {
+    const editButton = event.target.closest("[data-edit-extra]");
+    if (editButton) return fillExtraForm(editButton.dataset.editExtra);
+    const toggleButton = event.target.closest("[data-toggle-extra]");
+    if (toggleButton) toggleExtra(toggleButton.dataset.toggleExtra);
   });
 
   el.productForm.addEventListener("submit", saveProduct);
@@ -451,7 +424,7 @@ function bindEvents() {
   });
 }
 
-async function loadMenu() {
+async function loadMenu({ force = false } = {}) {
   setSync("Sincronizando");
   const configuredUrl = API_URL.trim();
 
@@ -461,33 +434,57 @@ async function loadMenu() {
     return;
   }
 
-  showLoader("Actualizando carta", "Consultando la informacion mas reciente.");
-  try {
-    const url = new URL(configuredUrl);
-    url.searchParams.set("action", "menu");
-    url.searchParams.set("_", Date.now().toString());
-
-    const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const payload = await response.json();
-    if (!payload.ok) throw new Error(payload.error || "Respuesta invalida");
-
-    applyMenu(payload.data || payload);
-    setSync("Carta actualizada");
-  } catch (error) {
-    console.error(error);
-    applyMenu(demoMenu);
-    setSync("Modo respaldo");
-    toast("No se pudo sincronizar la carta. Se cargo una version de respaldo.");
-  } finally {
-    hideLoader();
+  if (!force) {
+    const cachedMenu = readMenuCache();
+    if (cachedMenu) {
+      applyMenu(cachedMenu);
+      setSync("Carta guardada · actualizando");
+    }
   }
+
+  if (menuRequest) return menuRequest;
+
+  const hasVisibleMenu = state.products.length > 0 || state.extras.length > 0;
+  if (!hasVisibleMenu) showLoader("Actualizando carta", "Consultando la informacion mas reciente.");
+
+  menuRequest = (async () => {
+    try {
+      const url = new URL(configuredUrl);
+      url.searchParams.set("action", "menu");
+
+      const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const payload = await response.json();
+      if (payload.ok === false) throw new Error(payload.error || "Respuesta invalida");
+
+      const menu = payload.data || payload.menu || payload;
+      writeMenuCache(menu);
+      applyMenu(menu);
+      setSync("Carta actualizada");
+    } catch (error) {
+      console.error(error);
+      if (!hasVisibleMenu) {
+        applyMenu(demoMenu);
+        setSync("Modo respaldo");
+        toast("No se pudo sincronizar la carta. Se cargo una version de respaldo.");
+      } else {
+        setSync("Carta guardada · sin cambios");
+        toast("No se pudo actualizar la carta. Se conserva la informacion visible.");
+      }
+    } finally {
+      if (!hasVisibleMenu) hideLoader();
+      menuRequest = null;
+    }
+  })();
+
+  return menuRequest;
 }
 
 function applyMenu(menu) {
-  state.products = normalizeProducts(menu.products || menu.productos || []);
-  state.extras = normalizeExtras(menu.extras || []);
+  const normalizedMenu = normalizeMenuPayload(menu);
+  state.products = normalizeProducts(normalizedMenu.products);
+  state.extras = normalizeExtras(normalizedMenu.extras);
   state.categories = buildCategories(state.products);
   state.activeCategory = state.categories.some(category => category.id === state.activeCategory)
     ? state.activeCategory
@@ -495,11 +492,73 @@ function applyMenu(menu) {
   renderAll();
 }
 
+function normalizeMenuPayload(menu) {
+  const source = Array.isArray(menu) ? { products: menu } : (menu || {});
+  const products = [
+    ...(Array.isArray(source.products) ? source.products : []),
+    ...(Array.isArray(source.productos) ? source.productos : [])
+  ];
+  const categories = source.categories || source.categorias || source.category || [];
+
+  if (Array.isArray(categories)) {
+    categories.forEach(category => {
+      const categoryId = category.id || category.categoria_id || category.category_id || category.slug || category.nombre || category.name;
+      const nestedProducts = category.products || category.productos || category.items || [];
+      if (!Array.isArray(nestedProducts)) return;
+      nestedProducts.forEach(product => {
+        products.push({
+          ...product,
+          categoria_id: product.categoria_id || product.category_id || product.category || categoryId
+        });
+      });
+    });
+  }
+
+  return {
+    products,
+    extras: source.extras || source.addons || source.adiciones || []
+  };
+}
+
+function readMenuCache() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(menuCacheKey()) || "null");
+    if (!cached || !cached.data || Date.now() - Number(cached.savedAt) > MENU_CACHE_TTL_MS) return null;
+    return cached.data;
+  } catch {
+    return null;
+  }
+}
+
+function writeMenuCache(menu) {
+  try {
+    localStorage.setItem(menuCacheKey(), JSON.stringify({ savedAt: Date.now(), data: menu }));
+  } catch {
+    // La carta sigue funcionando aunque el almacenamiento local no este disponible.
+  }
+}
+
+function invalidateMenuCache() {
+  try {
+    localStorage.removeItem(menuCacheKey());
+  } catch {
+    // No bloquear una escritura confirmada por un problema de almacenamiento local.
+  }
+}
+
+function scheduleCatalogRender() {
+  if (catalogRenderFrame) return;
+  catalogRenderFrame = window.requestAnimationFrame(() => {
+    catalogRenderFrame = 0;
+    renderProducts();
+  });
+}
+
 function renderAll() {
   renderCategories();
   renderProducts();
   renderCart();
-  renderAdmin();
+  if (state.adminToken) renderAdmin();
 }
 
 function renderCategories() {
@@ -515,13 +574,6 @@ function renderCategories() {
     return `<button class="category-btn ${active}" type="button" data-category="${escapeAttr(category.id)}">${escapeHtml(category.label)} (${count})</button>`;
   }).join("");
 
-  el.categories.querySelectorAll("[data-category]").forEach(button => {
-    button.addEventListener("click", () => {
-      state.activeCategory = button.dataset.category;
-      renderCategories();
-      renderProducts();
-    });
-  });
 }
 
 function renderProducts() {
@@ -557,9 +609,6 @@ function renderProducts() {
     `;
   }).join("");
 
-  el.catalog.querySelectorAll("[data-add-product]").forEach(button => {
-    button.addEventListener("click", () => openProductModal(button.dataset.addProduct));
-  });
 }
 
 function openProductModal(productId, cartIndex = null) {
@@ -773,7 +822,7 @@ function renderCart() {
           <h3>${escapeHtml(item.title)}</h3>
           ${optionText ? `<small>${escapeHtml(optionText)}</small>` : ""}
           <small>${escapeHtml(extrasText)}</small>
-          <small>Total linea: ${formatMoney(getItemTotal(item))}</small>
+          <small>Total: ${formatMoney(getItemTotal(item))}</small>
         </div>
         <div>
           <div class="qty-controls">
@@ -790,23 +839,6 @@ function renderCart() {
     `;
   }).join("");
 
-  el.cartItems.querySelectorAll("[data-cart-plus]").forEach(button => {
-    button.addEventListener("click", () => changeCartQty(Number(button.dataset.cartPlus), 1));
-  });
-  el.cartItems.querySelectorAll("[data-cart-minus]").forEach(button => {
-    button.addEventListener("click", () => changeCartQty(Number(button.dataset.cartMinus), -1));
-  });
-  el.cartItems.querySelectorAll("[data-cart-remove]").forEach(button => {
-    button.addEventListener("click", () => removeCartItem(Number(button.dataset.cartRemove)));
-  });
-  el.cartItems.querySelectorAll("[data-cart-edit]").forEach(button => {
-    button.addEventListener("click", () => {
-      const index = Number(button.dataset.cartEdit);
-      const item = state.cart[index];
-      closeCart();
-      openProductModal(item.product_id, index);
-    });
-  });
 }
 
 function changeCartQty(index, delta) {
@@ -901,24 +933,24 @@ function submitCheckout(event) {
   const subtotal = getCartTotals().subtotal;
   const total = subtotal + moneyToBigInt(delivery);
   const lines = [
-    "🧾 *Nuevo Pedido - Arepas Dog Burger 🍔✅*",
-    `👤 Cliente: ${name}`,
-    `📞 Teléfono: ${phone}`,
-    `🚚 Tipo: ${method}`,
-    ...(method === "domicilio" ? [`📍 Dirección: ${address}`] : []),
-    `💳 Pago: ${payment}`,
+    `*Nuevo pedido - ${BUSINESS_NAME}*`,
+    `Cliente: ${name}`,
+    `Telefono: ${phone}`,
+    `Tipo: ${method}`,
+    ...(method === "domicilio" ? [`Direccion: ${address}`] : []),
+    `Pago: ${payment}`,
     "",
-    "🍔 *Detalle del pedido:*"
+    "*Detalle del pedido:*"
   ];
 
   state.cart.forEach(item => {
     const qty = clampQuantity(item.qty);
     const optionText = item.option_label || "";
-    lines.push(`${qty}x ${item.title} (${optionText}) — *${formatMoney(moneyToBigInt(item.price) * qtyToBigInt(qty))}*`);
+    lines.push(`${qty}x ${item.title} (${optionText}) - *${formatMoney(moneyToBigInt(item.price) * qtyToBigInt(qty))}*`);
     if ((item.extras || []).length) {
       item.extras.forEach(extra => {
         const extraQty = clampQuantity(extra.qty);
-        lines.push(`   ➕ ${extraQty}x ${extra.nombre} (${formatMoney(moneyToBigInt(extra.precio) * qtyToBigInt(extraQty))})`);
+        lines.push(`   + ${extraQty}x ${extra.nombre} (${formatMoney(moneyToBigInt(extra.precio) * qtyToBigInt(extraQty))})`);
       });
     }
   });
@@ -928,10 +960,10 @@ function submitCheckout(event) {
     : formatMoney(delivery);
 
   lines.push("");
-  lines.push(`🧮 Subtotal: ${formatMoney(subtotal)}`);
-  lines.push(`🏪 Envío: ${deliveryText}`);
-  lines.push(`💰 *Total: ${formatMoney(total)}*`);
-  lines.push(`📝 Notas: ${notes || "Sin notas"}`);
+  lines.push(`Subtotal: ${formatMoney(subtotal)}`);
+  lines.push(`Envio: ${deliveryText}`);
+  lines.push(`*Total: ${formatMoney(total)}*`);
+  lines.push(`Notas: ${notes || "Sin notas"}`);
 
   const whatsappUrl = `https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(lines.join("\n"))}`;
   window.open(whatsappUrl, "_blank", "noopener,noreferrer");
@@ -1016,15 +1048,6 @@ function renderAdminProductCategories() {
     return `<button class="admin-filter-btn ${active}" type="button" data-admin-product-category="${escapeAttr(category.id)}">${escapeHtml(category.label)} <span>${category.count}</span></button>`;
   }).join("");
 
-  el.adminProductCategories.querySelectorAll("[data-admin-product-category]").forEach(button => {
-    button.addEventListener("click", () => {
-      state.adminProductCategory = button.dataset.adminProductCategory;
-      state.adminProductSearch = "";
-      el.adminProductSearch.value = "";
-      renderAdminProductCategories();
-      renderAdminProducts();
-    });
-  });
 }
 
 function renderAdminProducts() {
@@ -1049,12 +1072,6 @@ function renderAdminProducts() {
     </article>
   `).join("") || `<div class="empty-state">No hay productos cargados en esta categoria.</div>`;
 
-  el.productList.querySelectorAll("[data-edit-product]").forEach(button => {
-    button.addEventListener("click", () => fillProductForm(button.dataset.editProduct));
-  });
-  el.productList.querySelectorAll("[data-delete-product]").forEach(button => {
-    button.addEventListener("click", () => deleteProduct(button.dataset.deleteProduct));
-  });
 }
 
 function renderAdminExtras() {
@@ -1073,12 +1090,6 @@ function renderAdminExtras() {
     </article>
   `).join("") || `<div class="empty-state">No hay extras cargados.</div>`;
 
-  el.extraList.querySelectorAll("[data-edit-extra]").forEach(button => {
-    button.addEventListener("click", () => fillExtraForm(button.dataset.editExtra));
-  });
-  el.extraList.querySelectorAll("[data-toggle-extra]").forEach(button => {
-    button.addEventListener("click", () => toggleExtra(button.dataset.toggleExtra));
-  });
 }
 
 function fillProductForm(productId) {
@@ -1374,6 +1385,7 @@ async function postAdmin(action, data, loaderTitle = "Sincronizando cambios", lo
 
     const payload = await response.json();
     if (!response.ok || !payload.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+    invalidateMenuCache();
     toast("La carta quedo actualizada correctamente.");
     return true;
   } catch (error) {
@@ -1386,23 +1398,31 @@ async function postAdmin(action, data, loaderTitle = "Sincronizando cambios", lo
 }
 
 function normalizeProducts(products) {
+  const seen = new Set();
   return products
     .map(normalizeProduct)
     .filter(product => product.producto_id && product.nombre)
+    .filter(product => {
+      if (seen.has(product.producto_id)) return false;
+      seen.add(product.producto_id);
+      return true;
+    })
     .sort(sortByOrderThenName);
 }
 
 function normalizeProduct(product) {
   return {
-    producto_id: String(product.producto_id || product.id || makeId("prod")).trim(),
-    categoria_id: normalizeCategoryId(product.categoria_id || product.category || "general"),
-    nombre: String(product.nombre || product.title || "").trim(),
-    precio: moneyToNumber(product.precio ?? product.price),
-    descripcion: String(product.descripcion || product.desc || "").trim(),
+    producto_id: String(product.producto_id || product.product_id || product.id || makeId("prod")).trim(),
+    categoria_id: normalizeCategoryId(product.categoria_id || product.category_id || product.category || "general"),
+    nombre: String(product.nombre || product.name || product.title || "").trim(),
+    precio: moneyToNumber(product.precio ?? product.price ?? product.valor),
+    descripcion: String(product.descripcion || product.description || product.desc || "").trim(),
     imagen: String(product.imagen || product.image || "").trim(),
     opciones: normalizeProductOptions(product.opciones ?? product.options ?? product.sizes),
-    orden: moneyToNumber(product.orden),
-    activo: toBool(product.activo)
+    orden: moneyToNumber(product.orden ?? product.order ?? product.position),
+    activo: product.activo === undefined && product.active === undefined && product.available === undefined
+      ? true
+      : toBool(product.activo ?? product.active ?? product.available)
   };
 }
 
@@ -1475,37 +1495,31 @@ function productAllowsExtras(product) {
 }
 
 function resolveProductImage(product) {
-  const explicit = resolveImagePath(product.imagen);
-  if (explicit) return explicit;
+  const explicit = String(product.imagen || "").trim();
+  if (/^https?:\/\//i.test(explicit)) return explicit;
 
-  const known = getKnownProductImage(product);
-  return known ? resolveImagePath(known) : "";
+  const family = detectProductImageFamily(product);
+  const images = PRODUCT_IMAGE_LIBRARY[family] || PRODUCT_IMAGE_LIBRARY.default;
+  const source = `${product.producto_id || ""}:${product.nombre || ""}`;
+  const index = [...source].reduce((total, character) => total + character.charCodeAt(0), 0) % images.length;
+  return `./images/hot-kitchen/${images[index]}`;
 }
 
-function resolveImagePath(value) {
-  const image = String(value || "").trim();
-  if (!image) return "";
-  if (/^https?:\/\//i.test(image) || image.startsWith("data:")) return image;
-  if (image.startsWith("./") || image.startsWith("images/")) return image;
-  return `./images/${image}`;
-}
+function detectProductImageFamily(product) {
+  const category = normalizeCategoryId(product.categoria_id);
+  const name = normalizeImageKey(product.nombre);
 
-function getKnownProductImage(product) {
-  const productId = normalizeKnownProductId(product.producto_id || product.id);
-  const known = KNOWN_PRODUCT_IMAGES_BY_ID[productId];
-  if (!known) return "";
-
-  const sameCategory = normalizeCategoryId(product.categoria_id) === normalizeCategoryId(known.category);
-  if (!sameCategory) return "";
-
-  const currentName = compactImageKey(product.nombre);
-  const knownName = compactImageKey(known.name);
-  const sameProduct = currentName && knownName && (currentName.includes(knownName) || knownName.includes(currentName));
-  return sameProduct ? known.image : "";
-}
-
-function normalizeKnownProductId(value) {
-  return String(value || "").trim().replace(/^prod-/i, "");
+  if (category === "choripan") {
+    if (name.includes("perro")) return "perros";
+    if (name.includes("salchipapa")) return "salchipapas";
+  }
+  if (category === "lo-de-casita") {
+    if (name.includes("alita")) return "wings";
+    if (name.includes("mazorca") || name.includes("desgranado")) return "maicitos";
+    if (name.includes("pechuga")) return "carnes";
+  }
+  if (category === "pica-hot" && name.includes("chicharron")) return "picadas";
+  return category || detectCategoryFamily(category, product.nombre);
 }
 
 function normalizeImageKey(value) {
@@ -1529,6 +1543,9 @@ function getImageTokens(value) {
 }
 
 function detectCategoryFamily(categoryId, productName = "") {
+  const normalizedCategoryId = normalizeCategoryId(categoryId);
+  if (PRODUCT_IMAGE_LIBRARY[normalizedCategoryId]) return normalizedCategoryId;
+
   const categoryKey = normalizeImageKey(categoryId);
   const categoryCompact = compactImageKey(categoryId);
   const nameKey = normalizeImageKey(productName);

@@ -353,9 +353,12 @@ function bindEvents() {
   });
   el.nextStep1.addEventListener("click", goToCheckoutStep2);
   el.backStep2.addEventListener("click", () => setCheckoutStep(1));
-  el.checkoutForm.addEventListener("input", persistCheckoutDraft);
-  el.checkoutForm.addEventListener("change", () => {
-    updateCheckoutControls();
+  el.checkoutForm.addEventListener("input", event => {
+    if (event.target.name === "method") updateCheckoutControls();
+    persistCheckoutDraft();
+  });
+  el.checkoutForm.addEventListener("change", event => {
+    if (event.target.name !== "method") updateCheckoutControls();
     persistCheckoutDraft();
   });
   el.checkoutForm.addEventListener("submit", submitCheckout);

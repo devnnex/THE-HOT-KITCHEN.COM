@@ -6,6 +6,7 @@ const BUSINESS_NAME = "The Hot Kitchen";
 const BUSINESS_PHONE = "573042783617";
 const DELIVERY_FEE = 0;
 const CART_KEY = "adb_cart_v2";
+const CHECKOUT_DRAFT_KEY = "thk_checkout_draft_v1";
 const MENU_CACHE_PREFIX = "thk_menu_cache_v1:";
 const MENU_CACHE_TTL_MS = 15000;
 const MAX_QTY = 999999;
@@ -350,7 +351,11 @@ function bindEvents() {
   });
   el.nextStep1.addEventListener("click", goToCheckoutStep2);
   el.backStep2.addEventListener("click", () => setCheckoutStep(1));
-  el.checkoutForm.addEventListener("change", updateCheckoutControls);
+  el.checkoutForm.addEventListener("input", persistCheckoutDraft);
+  el.checkoutForm.addEventListener("change", () => {
+    updateCheckoutControls();
+    persistCheckoutDraft();
+  });
   el.checkoutForm.addEventListener("submit", submitCheckout);
 
   el.menuBtn.addEventListener("click", openSideMenu);
@@ -871,7 +876,7 @@ function openCheckout() {
     return;
   }
   closeCart();
-  el.checkoutForm.reset();
+  restoreCheckoutDraft();
   setCheckoutStep(1);
   updateCheckoutControls();
   openLayer(el.checkoutModal);
@@ -970,6 +975,8 @@ function submitCheckout(event) {
 
   state.cart = [];
   persistCart();
+  clearCheckoutDraft();
+  el.checkoutForm.reset();
   renderCart();
   closeCheckout();
 }
@@ -1632,6 +1639,54 @@ function closeProductModal() {
 
 function closeCheckout() {
   closeLayer(el.checkoutModal);
+}
+
+function persistCheckoutDraft() {
+  if (!el.checkoutForm) return;
+  const form = el.checkoutForm;
+  const draft = {
+    name: form.elements.name.value,
+    phone: form.elements.phone.value,
+    method: form.querySelector("input[name='method']:checked")?.value || "recoger",
+    address: form.elements.address.value,
+    payment: form.elements.payment.value,
+    notes: form.elements.notes.value
+  };
+
+  try {
+    localStorage.setItem(CHECKOUT_DRAFT_KEY, JSON.stringify(draft));
+  } catch {
+    // El checkout sigue funcionando aunque el almacenamiento local no este disponible.
+  }
+}
+
+function restoreCheckoutDraft() {
+  let draft = null;
+  try {
+    draft = JSON.parse(localStorage.getItem(CHECKOUT_DRAFT_KEY) || "null");
+  } catch {
+    draft = null;
+  }
+
+  if (!draft) return;
+
+  const form = el.checkoutForm;
+  form.elements.name.value = draft.name || "";
+  form.elements.phone.value = draft.phone || "";
+  form.elements.address.value = draft.address || "";
+  form.elements.payment.value = draft.payment || "";
+  form.elements.notes.value = draft.notes || "";
+  form.querySelectorAll("input[name='method']").forEach(input => {
+    input.checked = input.value === (draft.method || "recoger");
+  });
+}
+
+function clearCheckoutDraft() {
+  try {
+    localStorage.removeItem(CHECKOUT_DRAFT_KEY);
+  } catch {
+    // No bloquear el cierre del pedido por un problema de almacenamiento local.
+  }
 }
 
 function openSideMenu() {

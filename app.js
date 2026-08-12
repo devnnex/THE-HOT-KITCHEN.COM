@@ -1,6 +1,6 @@
 // Cambia solo esta URL cuando el nuevo backend este listo. La app acepta
 // respuestas { products }, { productos }, o categorias con productos anidados.
-const API_URL = window.HOT_KITCHEN_API_URL || "https://script.google.com/macros/s/AKfycby4vlZuwNB26Ke9PLRbe5OiiCoZTv2dmMkNh0QJ_LlTV7ZE8zs2DDx3FUXXxmaMrha2/exec";
+const API_URL = window.HOT_KITCHEN_API_URL || "https://script.google.com/macros/s/AKfycbyB0qk9FPmKEf4CV7FEk9M_pdIPGiWV7YE6FX0yx5zn7wnRakN9ouu5vcGOApmEmwi1/exec";
 
 const BUSINESS_NAME = "The Hot Kitchen";
 const BUSINESS_PHONE = "573042783617";

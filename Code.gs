@@ -125,7 +125,11 @@ function invalidateMenuCache_() {
 }
 
 function readTable_(tableConfig) {
-  var sheet = ensureSheet_(tableConfig);
+  // Una lectura publica no debe crear ni reconfigurar hojas vacias.
+  // La accion POST setup conserva la preparacion explicita de las hojas.
+  var sheet = spreadsheet_().getSheetByName(tableConfig.sheetName);
+  if (!sheet) return [];
+
   var headers = getHeaders_(sheet, tableConfig.headers);
   var lastRow = sheet.getLastRow();
 

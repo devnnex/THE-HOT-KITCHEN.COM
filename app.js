@@ -219,6 +219,8 @@ const state = {
 
 let menuRequest = null;
 let catalogRenderFrame = 0;
+let initialLoaderTimer = 0;
+let initialLoaderActive = false;
 
 function menuCacheKey() {
   return `${MENU_CACHE_PREFIX}${API_URL.trim() || "demo"}`;
@@ -450,7 +452,11 @@ async function loadMenu({ force = false } = {}) {
   if (menuRequest) return menuRequest;
 
   const hasVisibleMenu = state.products.length > 0 || state.extras.length > 0;
-  if (!hasVisibleMenu) showLoader("Actualizando carta", "Consultando la informacion mas reciente.");
+  if (!hasVisibleMenu) {
+    showLoader("Actualizando carta", "Consultando la informacion mas reciente.");
+    initialLoaderActive = true;
+    initialLoaderTimer = window.setTimeout(finishInitialLoader, 800);
+  }
 
   menuRequest = (async () => {
     try {
@@ -478,7 +484,7 @@ async function loadMenu({ force = false } = {}) {
         toast("No se pudo actualizar la carta. Se conserva la informacion visible.");
       }
     } finally {
-      if (!hasVisibleMenu) hideLoader();
+      if (!hasVisibleMenu) finishInitialLoader();
       menuRequest = null;
     }
   })();
@@ -1732,6 +1738,16 @@ function hideLoader() {
   if (showLoader.count > 0) return;
   el.loader.classList.add("hidden");
   el.loader.setAttribute("aria-hidden", "true");
+}
+
+function finishInitialLoader() {
+  if (initialLoaderTimer) {
+    window.clearTimeout(initialLoaderTimer);
+    initialLoaderTimer = 0;
+  }
+  if (!initialLoaderActive) return;
+  initialLoaderActive = false;
+  hideLoader();
 }
 
 function toast(message) {

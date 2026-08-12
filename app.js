@@ -938,24 +938,24 @@ function submitCheckout(event) {
   const subtotal = getCartTotals().subtotal;
   const total = subtotal + moneyToBigInt(delivery);
   const lines = [
-    `*Nuevo pedido - ${BUSINESS_NAME}*`,
-    `Cliente: ${name}`,
-    `Telefono: ${phone}`,
-    `Tipo: ${method}`,
-    ...(method === "domicilio" ? [`Direccion: ${address}`] : []),
-    `Pago: ${payment}`,
+    `🔥 *Nuevo pedido - ${BUSINESS_NAME}*`,
+    `👤 Cliente: ${name}`,
+    `📞 Telefono: ${phone}`,
+    `🚚 Tipo: ${method}`,
+    ...(method === "domicilio" ? [`📍 Direccion: ${address}`] : []),
+    `💳 Pago: ${payment}`,
     "",
-    "*Detalle del pedido:*"
+    "🍔 *Detalle del pedido:*"
   ];
 
   state.cart.forEach(item => {
     const qty = clampQuantity(item.qty);
     const optionText = item.option_label || "";
-    lines.push(`${qty}x ${item.title} (${optionText}) - *${formatMoney(moneyToBigInt(item.price) * qtyToBigInt(qty))}*`);
+    lines.push(`🍽️ ${qty}x ${item.title} (${optionText}) - *${formatMoney(moneyToBigInt(item.price) * qtyToBigInt(qty))}*`);
     if ((item.extras || []).length) {
       item.extras.forEach(extra => {
         const extraQty = clampQuantity(extra.qty);
-        lines.push(`   + ${extraQty}x ${extra.nombre} (${formatMoney(moneyToBigInt(extra.precio) * qtyToBigInt(extraQty))})`);
+        lines.push(`   ➕ ${extraQty}x ${extra.nombre} (${formatMoney(moneyToBigInt(extra.precio) * qtyToBigInt(extraQty))})`);
       });
     }
   });
@@ -965,10 +965,10 @@ function submitCheckout(event) {
     : formatMoney(delivery);
 
   lines.push("");
-  lines.push(`Subtotal: ${formatMoney(subtotal)}`);
-  lines.push(`Envio: ${deliveryText}`);
-  lines.push(`*Total: ${formatMoney(total)}*`);
-  lines.push(`Notas: ${notes || "Sin notas"}`);
+  lines.push(`🧮 Subtotal: ${formatMoney(subtotal)}`);
+  lines.push(`🏪 Envio: ${deliveryText}`);
+  lines.push(`💰 *Total: ${formatMoney(total)}*`);
+  lines.push(`📝 Notas: ${notes || "Sin notas"}`);
 
   const whatsappUrl = `https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(lines.join("\n"))}`;
   window.open(whatsappUrl, "_blank", "noopener,noreferrer");
